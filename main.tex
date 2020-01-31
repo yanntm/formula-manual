@@ -33,7 +33,7 @@
   pageanchor=true,
   allcolors=[rgb]{0.3,0.3,0.99},
   pdftitle={Property Language Manual},
-  pdfauthor={The MCC 2015 formula team}
+  pdfauthor={The MCC 2015-2019 formula team}
 }
 
 \setlength{\grammarindent}{11em}
@@ -55,8 +55,14 @@
 \newcommand\logicnot         {\boldmath$\lnot$\xspace}
 \newcommand\logicand         {\boldmath$\land$\xspace}
 \newcommand\logicor          {\boldmath$\lor$\xspace}
+\newcommand\quantexist       {\boldmath$\exists$\xspace}
+\newcommand\quantall         {\boldmath$\forall$\xspace}
 \newcommand\atomleq          {\boldmath$\leq$\xspace}
 \newcommand\atomdead         {\textbf{deadlock}\xspace}
+%\newcommand\atomql           {\textbf{quasilive}\xspace}
+%\newcommand\atomstable       {\textbf{stablemarking}\xspace}
+%\newcommand\atomlive         {\textbf{live}\xspace}
+%\newcommand\atomsafe         {\textbf{safe}\xspace}
 \newcommand\atomisfire[1]    {\textbf{is-fireable}(#1)}
 \newcommand\atomplacebnd[1]  {\textbf{place-bound}(#1)}
 \newcommand\atomtokenscnt[1] {\textbf{token-count}(#1)}
@@ -173,14 +179,13 @@
 \Huge
 The Property Language Manual \\[10pt]
 \Large
-Model Checking Contest @ Petri Nets 2017
+Model Checking Contest @ Petri Nets 2020
 
 \vspace{3cm}
 \large
 Contact: \\[15pt]
 The \mcc{} formula team, \\
-\href{mailto:cesar.rodriguez@lipn.fr}{César Rodríguez},
-\href{mailto:loig.jezequel@irccyn.ec-nantes.fr}{Loïg Jezequel},
+\href{mailto:loig.jezequel@univ-nantes.fr}{Loïg Jezequel},
 \href{mailto:emmanuel.paviot-adet@lip6.fr}{Emmanuel Paviot-Adet}
 \vspace{2cm}
 
@@ -188,7 +193,7 @@ The \mcc{} formula team, \\
 ~
 \hfill
 \scriptsize
-v\@. Feb\@. 27, 2017
+v\@. Jan\@. 31, 2020
 \normalsize
 
 \clearpage
@@ -200,7 +205,7 @@ v\@. Feb\@. 27, 2017
 \mysubsection{Scope}
 
 This document is intended as a guide for the developers of
-the tools participating in the \mccl{}, edition 2017.
+the tools participating in the \mccl{}, edition 2020.
 It specifically contains:
 
 \begin{itemize}
@@ -215,37 +220,45 @@ It specifically contains:
 
 \mysubsection{Categories of the contest}
 
-The \mccl{} compares the competing verification tools on four
+The \mccl{} compares the competing verification tools on six
 categories of verification goals:
 
 \begin{enumerate}
 \item State Space generation
+\item Global properties analysis
 \item Upper bound analysis
 \item Reachability analysis
 \item LTL analysis
 \item CTL analysis
 \end{enumerate}
 
-To maximize tool participation, we have further divided the last 4
-categories into 8 subcategories, where only restricted kinds of formulas
+To maximize tool participation, we have further divided some of these categories
+into subcategories, where only restricted kinds of formulas
 will be found:
 
 \begin{center}
-\begin{tabular}{ll}
+\begin{tabular}{lll}
 \toprule
-Subcategory                       & Description \\
+{\bf Category} & {\bf Subcategory}                       & {\bf Description} \\
 \midrule
-UpperBounds                    & Computing the exact upper bound of a set of places \\
+State Space generation & StateSpace & Counting the number of states in a marking graph \\
 \midrule
-ReachabilityDeadlock           & Existence of deadlock states \\
-ReachabilityFireability        & Boolean combinations of propositions checking firability of transitions \\
-ReachabilityCardinality        & Boolean combinations of propositions comparing the number of tokens in places\\
+Global properties analysis & GlobalProperties           & Existence of deadlock states \\
+& QLDetection                 & Quasi-liveness detection \\
+& StableMarkingDetection      & Detection of stable markings \\
+& Liveness                    & Liveness detection \\
+& 1Safe                       & 1-safeness detection \\
 \midrule
-LTLFireability                 & Full LTL with atomic propositions checking firability of transitions \\
-LTLCardinality                 & Full LTL with atomic propositions comparing the number of tokens in places \\
+Upper bound analysis & UpperBounds                    & Computing the exact upper bound of a set of places \\
 \midrule
-CTLFireability                 & Full CTL with atomic propositions checking firability of transitions \\
-CTLCardinality                 & Full CTL with atomic propositions comparing the number of tokens in places \\
+Reachability analysis & ReachabilityFireability        & Boolean combinations of checks of firability of transitions \\
+& ReachabilityCardinality        & Boolean combinations of comparisons of numbers of tokens\\
+\midrule
+LTL analysis & LTLFireability                 & LTL with atomic propositions on firability of transitions \\
+& LTLCardinality                 & LTL with atomic propositions on number of tokens\\
+\midrule
+CTL analysis & CTLFireability                 & CTL with atomic propositions on firability of transitions \\
+& CTLCardinality                 & CTL with atomic propositions on numbers of tokens\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -254,11 +267,8 @@ Each subcategory designates the
 name of an XML file providing, for every benchmark, a set of formulæ for
 tools competing in this subcategory to solve.
 %
-Most of the 8 subcategories proposed this year were already proposed last
-year.\footnote{With respect to previous year we have removed three
-subcategories, all those named \textit{*Simple}, see instructions from the
-MCC'15. We have also unified into the category UpperBounds the subcategories
-where upper bounds of places needed to be computed.}
+Most of the subcategories proposed this year were already proposed last
+year. Only some global properties analysis are new.
 %FIXME
 %However, the class of formulas (\ie, the specific fragment of the
 %BNF grammar presented in \cref{s:bnf}) contained in each of them has
@@ -331,6 +341,10 @@ property language:
 \alt \logicnot <boolean-formula>
 \alt <boolean-formula> \logicand <boolean-formula>
 \alt <boolean-formula> \logicor <boolean-formula>
+\alt \quantexist p <boolean-formula>
+\alt \quantall p <boolean-formula>
+\alt \quantexist t <boolean-formula>
+\alt \quantall t <boolean-formula>
 \alt <atom>
 
 <atom> ::= \atomdead
@@ -350,7 +364,7 @@ property language:
 The property language considers two kinds of formulas:
 \textit{Boolean formulas},
 evaluating to a Boolean value, and \textit{bound formulas},
-which evaluate to 
+which evaluate to
 %an interval $[a,b] \subseteq \N$ over the natural numbers.
 a natural number.
 Only the subcategory
@@ -367,6 +381,7 @@ are the standard LTL operators.
 We define that the \ltlx operator evaluate to false if no successor state
 exists.  A \textit{Boolean formula} can also contain Boolean combinations of Boolean
 formulas.
+The \quantexist and \quantall operator quantify over places or transitions.
 Atomic propositions are either
 \begin{itemize}
 \item
@@ -394,7 +409,7 @@ is defined as follows:
 \begin{itemize}
 \item
   %Let $\N \eqdef \set{0, 1, 2, \ldots}$ be the set of natural numbers.
-  The atom \atomplacebnd{$p_1, \ldots, p_n$} evaluates to some 
+  The atom \atomplacebnd{$p_1, \ldots, p_n$} evaluates to some
 %interval
 %  $[a,b] \subseteq \N$ over the natural numbers,
   natural number $c$ so that $c$ is the maximum number of tokens that any reachable marking can put in all $n$
@@ -425,22 +440,7 @@ with.
 \Cref{s:rng} presents the correspondence between the above BNF grammar
 and the syntax of the XML files that will actually be passed to the tools.
 
-\mysubsection{Subcategory \textit{UpperBounds}}
-
-Observe that this is the only subcategory where formulas evaluate to something
-else than a Boolean value, in particular to %an interval $[a, b] \subseteq \N$
-%over the 
-a natural number. See the beginning of this section for the semantics
-of the atom \atomplacebnd{$\cdot$}.
-
-\begin{grammar}
-<formula> ::= <bound-formula>
-
-<bound-formula> ::= \atomplacebnd{$p_1, \ldots, p_n$}
-\end{grammar}
-
-
-\mysubsection{Subcategory \textit{ReachabilityDeadlock}}
+\mysubsection{Subcategory \textit{GlobalProperties}}
 
 Tools participating in this subcategory will only find one formula to solve
 for every benchmark:
@@ -452,6 +452,76 @@ for every benchmark:
 <boolean-formula> ::= \ctle \ltlf \atomdead
 %\alt A G $\lnot$ deadlock
 
+\end{grammar}
+
+\mysubsection{Subcategory \textit{QLDetection}}
+
+Tools participating in this subcategory will only find one formula to solve
+for every benchmark:
+
+\begin{grammar}
+
+<formula> ::= <boolean-formula>
+
+<boolean-formula> ::= ...
+%\alt A G $\lnot$ deadlock
+
+\end{grammar}
+
+\mysubsection{Subcategory \textit{StableMarkingDetection}}
+
+Tools participating in this subcategory will only find one formula to solve
+for every benchmark:
+
+\begin{grammar}
+
+<formula> ::= <boolean-formula>
+
+<boolean-formula> ::= ...
+%\alt A G $\lnot$ deadlock
+
+\end{grammar}
+
+\mysubsection{Subcategory \textit{Liveness}}
+
+Tools participating in this subcategory will only find one formula to solve
+for every benchmark:
+
+\begin{grammar}
+
+<formula> ::= <boolean-formula>
+
+<boolean-formula> ::= ...
+%\alt A G $\lnot$ deadlock
+
+\end{grammar}
+
+\mysubsection{Subcategory \textit{1Safe}}
+
+Tools participating in this subcategory will only find one formula to solve
+for every benchmark:
+
+\begin{grammar}
+
+<formula> ::= <boolean-formula>
+
+<boolean-formula> ::= ...
+%\alt A G $\lnot$ deadlock
+
+\end{grammar}
+
+\mysubsection{Subcategory \textit{UpperBounds}}
+
+Observe that this is the only subcategory where formulas evaluate to something
+else than a Boolean value, in particular to %an interval $[a, b] \subseteq \N$
+%over the
+a natural number. See the beginning of this section for the semantics
+of the atom \atomplacebnd{$\cdot$}.
+
+\begin{grammar}
+<formula> ::= <bound-formula>
+
+<bound-formula> ::= \atomplacebnd{$p_1, \ldots, p_n$}
 \end{grammar}
 
 \mysubsection{Subcategories \textit{ReachabilityFireability} and \textit{ReachabilityCardinality}}
@@ -509,6 +579,9 @@ The grammar is the following:
 \alt \ltlf <path-formula>
 \alt \ltlx <path-formula>
 \alt <path-formula> \ltlu <path-formula>
+\alt \logicnot <path-formula>
+\alt <path-formula> \logicand <path-formula>
+\alt <path-formula> \logicor <path-formula>
 \alt <atom>
 
 \end{grammar}
@@ -947,7 +1020,7 @@ Recall that
 
 \begin{multicols}{2}
 \begin{lstlisting}
-  bound-formula = 
+  bound-formula =
       element place-bound {
         place+
       }
@@ -961,7 +1034,7 @@ Recall that
 
 Recall that
 \begin{itemize}
-\item for a set of places, \lstinline!place-bound! returns some 
+\item for a set of places, \lstinline!place-bound! returns some
 %interval
 %  $[a,b] \subseteq \N$ over the natural numbers,
 %  where $a \in \N$ and $b \in \N \cup \set \infty$, if
@@ -1120,7 +1193,7 @@ We did not test them, but are interested by feedback if you use one.
 %% \end{enumerate}
 %% The final score is a weighted sum of three sub-scores evaluating these aspects.
 %% FIXME.
-%% Let $i \in \set{1, \ldots, n}$ be one of the tools. 
+%% Let $i \in \set{1, \ldots, n}$ be one of the tools.
 
 %% \textbf{Correction of the result}. The sub-score for $i$ is computed as:
 %% \begin{itemize}
@@ -1147,4 +1220,3 @@ We did not test them, but are interested by feedback if you use one.
 %% \textbf{Time to compute the result}. FIXME.
 
 \end{document}
-
