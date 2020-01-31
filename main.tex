@@ -463,7 +463,7 @@ for every benchmark:
 
 <formula> ::= <boolean-formula>
 
-<boolean-formula> ::= ...
+<boolean-formula> ::= \quantall t~ \ctle \ltlf \atomisfire{t}
 %\alt A G $\lnot$ deadlock
 
 \end{grammar}
@@ -491,7 +491,7 @@ for every benchmark:
 
 <formula> ::= <boolean-formula>
 
-<boolean-formula> ::= ...
+<boolean-formula> ::= \quantall t~ \ctla \ltlg \ctle \ltlf \atomisfire{t}
 %\alt A G $\lnot$ deadlock
 
 \end{grammar}
@@ -505,7 +505,7 @@ for every benchmark:
 
 <formula> ::= <boolean-formula>
 
-<boolean-formula> ::= ...
+<boolean-formula> ::= \quantall p1~ \quantall p2~ \ctla \ltlg \atomtokenscnt{p1, p2} \atomleq 1
 %\alt A G $\lnot$ deadlock
 
 \end{grammar}
