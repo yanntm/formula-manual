@@ -58,6 +58,7 @@
 \newcommand\quantexist       {\boldmath$\exists$\xspace}
 \newcommand\quantall         {\boldmath$\forall$\xspace}
 \newcommand\atomleq          {\boldmath$\leq$\xspace}
+\newcommand\atomeq          {\boldmath$=$\xspace}
 \newcommand\atomdead         {\textbf{deadlock}\xspace}
 %\newcommand\atomql           {\textbf{quasilive}\xspace}
 %\newcommand\atomstable       {\textbf{stablemarking}\xspace}
@@ -345,16 +346,20 @@ property language:
 \alt \quantall p <boolean-formula>
 \alt \quantexist t <boolean-formula>
 \alt \quantall t <boolean-formula>
+\alt \quantexist x <boolean-formula>
+\alt \quantall x <boolean-formula>
 \alt <atom>
 
 <atom> ::= \atomdead
 \alt \atomisfire{$t_1, \ldots, t_n$}
 \alt <integer-expression> \atomleq <integer-expression>
+\alt <integer-expression> \atomeq <integer-expression>
 
 <integer-expression> ::=
      <integer-expression> \exprplus <integer-expression>
 \alt <integer-expression> \exprminus <integer-expression>
 \alt \textit{Integer constant}
+\alt x
 \alt \atomtokenscnt{$p_1, \ldots, p_n$}
 
 <bound-formula> ::= \atomplacebnd{$p_1, \ldots, p_n$}
@@ -381,7 +386,7 @@ are the standard LTL operators.
 We define that the \ltlx operator evaluate to false if no successor state
 exists.  A \textit{Boolean formula} can also contain Boolean combinations of Boolean
 formulas.
-The \quantexist and \quantall operator quantify over places or transitions.
+The \quantexist and \quantall operator quantify over places, transitions or an integer value $x$.
 Atomic propositions are either
 \begin{itemize}
 \item
@@ -390,7 +395,7 @@ Atomic propositions are either
   \atomisfire{$t_1, \ldots, t_n$}, which holds iff either $t_1$, or $t_2$,
   or \ldots or $t_n$ are enabled at the current state, or
 \item
-  inequalities of the form \synt{expr} \atomleq \synt{expr},
+  (in)equalities of the form \synt{expr} \atomeq \synt{expr} or \synt{expr} \atomleq \synt{expr},
   where \synt{expr} is an integer expression.
 \end{itemize}
 
@@ -477,7 +482,7 @@ for every benchmark:
 
 <formula> ::= <boolean-formula>
 
-<boolean-formula> ::= ...
+<boolean-formula> ::= \quantexist p~ \quantexist x~ \ctla \ltlg \atomtokenscnt{p} \atomeq x
 %\alt A G $\lnot$ deadlock
 
 \end{grammar}
