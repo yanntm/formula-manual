@@ -2,13 +2,52 @@
 
 \input{macros.tex}
 
-
-\title{CTL Semantics for the Use in MCC}
+\title{Property Semantics for the Use in MCC}
 
 \begin{document}
 \maketitle
 
 
+\begin{abstract}
+This document presents the official semantics for properties used in the Model-Checking Contest (MCC).
+
+\end{abstract}
+
+\section{Introduction}
+
+
+\section{Syntax}
+
+\subsection{Place Transition Nets}
+
+\subsection{Colored Nets}
+
+\subsection{Syntactic Expansion of Colored Nets to Place Transition Nets}
+
+\section{Semantics}
+
+\subsection{Reachable Marking Graph of a PT net}
+
+\subsection{Atomic Propositions on a marking}
+
+Finally, we fix the set of atomic propositions $\alpha$ ($\alpha \in \props$) 
+for Petri nets as used in the MCC Property Language:
+\begin{grammar}
+    \let\syntleft\relax
+    \let\syntright\relax
+    <$\alpha$> ::= \textit{t} |  $e_1 \bowtie e_2$
+
+    <$e$> ::= $c$ | $p$ | $e_1 \oplus e_2$
+\end{grammar}
+where  $t$ is a transition, $c \in \mathbb{N}^0$, $\bowtie$ $\in$ $\{<, \leq, =, \neq, >, \geq\}$, $p$ is a place, and $\oplus \in \{ +, -, * \}$.
+The evaluation function $\apeval$ for a marking $M$ is given as
+$\apeval(M) = \{ t \in T \mid t \in \en(M) \} \cup
+\{ e_1 \bowtie e_2 \mid \eval[M][e_1] \bowtie \eval[M][e_2]\}$
+where $\eval[M][c] = c$, $\eval[M][p] = M(p)$ and
+$\eval[M][e_{1} \oplus e_{2}] = \eval[M][e_{1}] \oplus \eval[M][e_{2}]$.
+
+
+\subsection{Labelled Kripke Structure}
 
 A \emph{labelled transition system} (LTS) is a 
 tuple $(\ltsstates, \ltslabels, \ltsedges)$ where $\ltsstates$ is a 
@@ -34,6 +73,8 @@ refers to the state $s_i$ in the path and is written as $\pi_i$.
 If $\pi$ is infinite then any $i$, $0 \leq i$, is a position in $\pi$.
 Otherwise $0 \leq i \leq n$ where $s_n$ is the last state in $\pi$.
 
+\section{CTL}
+
 We now define the syntax and semantics of a \emph{computation tree logic} 
 as used in the Model Checking Contest.
 Let \props be a set of atomic propositions.
@@ -58,7 +99,7 @@ We use \ctlformulas to denote the set of all CTL formulae.
 The semantics of a CTL formula $\varphi$ in a state $s \in \ltsstates$ 
 is given in Table~\ref{tab:CTLsemantics}. 
 
-\begin{table}[t]
+\begin{table}[htbp]
 \raggedbottom
 \begin{align*} 
     &s \models \true && \\
@@ -86,23 +127,75 @@ is given in Table~\ref{tab:CTLsemantics}.
 \end{table}
 
 %Let $N = \petriinhibtuple$ be a Petri net. 
-Finally, we fix the set of atomic propositions $\alpha$ ($\alpha \in \props$) 
-for Petri nets as used in the MCC Property Language:
-\begin{grammar}
-    \let\syntleft\relax
-    \let\syntright\relax
-    <$\alpha$> ::= \textit{t} |  $e_1 \bowtie e_2$
+\paragraph{Acknowledgement.} Definitions for CTL are taken from~\cite{BDJJS:PN:18}.
 
-    <$e$> ::= $c$ | $p$ | $e_1 \oplus e_2$
-\end{grammar}
-where  $t$ is a transition, $c \in \mathbb{N}^0$, $\bowtie$ $\in$ $\{<, \leq, =, \neq, >, \geq\}$, $p$ is a place, and $\oplus \in \{ +, -, * \}$.
-The evaluation function $\apeval$ for a marking $M$ is given as
-$\apeval(M) = \{ t \in T \mid t \in \en(M) \} \cup
-\{ e_1 \bowtie e_2 \mid \eval[M][e_1] \bowtie \eval[M][e_2]\}$
-where $\eval[M][c] = c$, $\eval[M][p] = M(p)$ and
-$\eval[M][e_{1} \oplus e_{2}] = \eval[M][e_{1}] \oplus \eval[M][e_{2}]$.
+\section{LTL}
 
-\paragraph{Acknowledgement.} Definitions are taken from~\cite{BDJJS:PN:18}.
+
+
+\textbf{Definition}
+\emph{Trace}
+A trace is an infinite sequence of markings connected by the one-step
+firing relation. The sequence may contain a deadlock marking which is
+then repeated forever.
+
+Formally : Let $\pi = (m_1 m_2 m_3 \ldots)$ be an infinite sequence of markings.
+It is a trace if $\forall i \in \nat,  i \geq 1$, $m_{i} \rtrans m_{i+1}$ or $m_i$ is a \emph{deadlock} state and $m_{i} = m_{i+1}$.
+\medskip
+
+
+\textbf{Definition}
+\emph{Suffix of a trace}
+
+A suffix of a trace is obtained from a given trace by removing the first n
+markings of the sequence, for some natural number n.
+
+Formally : Let $\pi = (m_1 m_2 m_3 \ldots)$ be a trace and $n \in \nat$, trace $\pi+n$
+is defined as $(m_{n+1} m_{n+2} m_{n+3} \ldots)$.
+
+For all natural $n$, $\pi+n$ is called the \emph{suffix of $\pi$}. 
+\medskip
+
+We consider that $\mathit{F}\varphi$ is interpreted semantically as $\true \mathit{U} \varphi$.
+
+The semantics of a LTL formula $\varphi$ in a trace $\pi = (m_1 m_2 m_3 \ldots)$ 
+is given in Table~\ref{tab:LTLsemantics}. 
+
+\begin{table}[htbp]
+\raggedbottom
+\begin{align*} 
+    &\pi \models \true && \\
+    &\pi \not\models \false &&  \\
+    &\pi \models \alpha && \mbox{iff }& \alpha \in \apeval(m_1) \\
+	&\pi \models \varphi_1 \land \varphi_2 &&\mbox{iff } &\pi \models \varphi_1 \mbox{ and } \pi \models \varphi_2 \\
+	&\pi \models \varphi_1 \lor \varphi_2 &&\mbox{iff }& \pi \models \varphi_1 \mbox{ or } \pi \models \varphi_2 \\
+	&\pi \models \neg \varphi&&\mbox{iff }& \mbox{ not } \pi \models \varphi\\
+	&\pi \models \mathit{X}\varphi&& \mbox{iff }& \pi+1 \models \varphi  \\ 
+	&\pi \models \mathit{G}\varphi&& \mbox{iff }& \forall i \in \nat, \pi+i \models \varphi  \\ 
+	&\pi \models \varphi_1 \mathit{U}\varphi_2&& \mbox{iff } &\exists i \in \nat,  \pi+i \models \varphi_2 \mbox{ and } 
+		 \forall j \in \nat, j < i, \pi+j \models \varphi_1   
+\end{align*}
+\caption{Semantics of LTL formulae} \label{tab:LTLsemantics}
+\end{table}
+
+
+Let $m_0$ be the initial marking of $N$.
+Trace $\pi = (m_1 m_2 m_3 \ldots)$ is called initial trace if $m0 = m1$.
+For an LTL formula $\varphi$, $N \models \varphi$ (equivalently: $N \models \A \varphi$ , where $\A$ is the
+universal path quantifier) if, for all initial traces $\pi, \pi \models \varphi$.
+
+
+
+Our definitions implicitly transform the reachability graph of N into a
+Kripke structure. A Kripke structure is a transition system where every
+state has at least one successor state. The transformation consists of
+adding, for each deadlock marking m, m as its own successor (self-
+loop). We have implemented this transformation in our definition of
+"trace". For Kripke structures, the definition of LTL semantics is
+undisputed, to our best knowledge.
+
+\paragraph{Acknowledgement.} Definitions for LTL are adapted from Karsten Wolf..
+
 
 \bibliographystyle{plain}
 \bibliography{references.bib}
