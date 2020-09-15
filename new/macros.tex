@@ -1,10 +1,13 @@
 \usepackage{syntax}
 
-\usepackage{amssymb}
-\usepackage{amsmath}
+%\usepackage{amssymb}
+%\usepackage{amsmath}
+\usepackage{dsfont}
 \usepackage{xspace} 
 \usepackage{xparse}
 \usepackage{subcaption}
+\usepackage{times}
+\usepackage{newtxtext,newtxmath}
 
 \newcommand{\rarc}[1]{\ensuremath{\xrightarrow{#1}}\xspace} % right pointing arc with label \arc{t}
 \newcommand{\ctlformulas}{\ensuremath{\Phi_{\mathit{CTL}}}\xspace} % set of CTL formulas
@@ -24,6 +27,16 @@
             {\ensuremath{\mathit{eval}_{#1}}\xspace}
             {\ensuremath{\mathit{eval}_{#1}(#2)}\xspace}}}
 
+% basic math : natural, relative integers, reals, Boolean
+\newcommand{\nat}%
+{\ensuremath{\mathds{N}}}
+\newcommand{\zrel}%
+{\ensuremath{\mathds{Z}}}
+\newcommand{\rea}%
+{\ensuremath{\mathds{R}}}
+\newcommand{\bool}%
+{\ensuremath{\mathds{B}}}
+
 % LTS
 \newcommand{\lts}{\ensuremath{TS}\xspace} % name of any LTS
 \newcommand{\ltsstates}{\ensuremath{\mathcal{S}}\xspace} % set of all markings
@@ -35,6 +48,7 @@
 \newcommand{\false}{\ensuremath{\mathit{false}}\xspace}
 \newcommand{\EF}{\ensuremath{\mathit{EF}}\xspace}
 \newcommand{\AG}{\ensuremath{\mathit{AG}}\xspace}
+\newcommand{\A}{\ensuremath{\mathit{A}}\xspace}
 
 \newcommand{\pathlen}{\ensuremath{\ell}\xspace}
 \newcommand{\paths}{\ensuremath{\Pi}\xspace}
