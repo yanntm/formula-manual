@@ -1,0 +1,44 @@
+\usepackage{syntax}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xspace} 
+\usepackage{xparse}
+\usepackage{subcaption}
+
+\newcommand{\rarc}[1]{\ensuremath{\xrightarrow{#1}}\xspace} % right pointing arc with label \arc{t}
+\newcommand{\ctlformulas}{\ensuremath{\Phi_{\mathit{CTL}}}\xspace} % set of CTL formulas
+
+
+\NewDocumentCommand{\rtrans}{oo} 
+{\IfNoValueTF {#1}
+        {\ensuremath{\xrightarrow{}}\xspace}
+        {\IfNoValueTF {#2}
+            {\ensuremath{\xrightarrow{#1}}\xspace}
+            {\ensuremath{\xrightarrow[#2]{#1}}\xspace}}}
+
+\NewDocumentCommand{\eval}{oo}
+{\IfNoValueTF {#1}
+        {\ensuremath{\mathit{eval}}\xspace}
+        {\IfNoValueTF {#2}
+            {\ensuremath{\mathit{eval}_{#1}}\xspace}
+            {\ensuremath{\mathit{eval}_{#1}(#2)}\xspace}}}
+
+% LTS
+\newcommand{\lts}{\ensuremath{TS}\xspace} % name of any LTS
+\newcommand{\ltsstates}{\ensuremath{\mathcal{S}}\xspace} % set of all markings
+\newcommand{\ltslabels}{\ensuremath{A}\xspace} % set of all markings
+\newcommand{\ltsedges}{\ensuremath{\mathcal{\rightarrow}}\xspace} % set of all markings
+
+\newcommand{\deadlock}{\ensuremath{\mathit{deadlock}}\xspace}
+\newcommand{\true}{\ensuremath{\mathit{true}}\xspace}
+\newcommand{\false}{\ensuremath{\mathit{false}}\xspace}
+\newcommand{\EF}{\ensuremath{\mathit{EF}}\xspace}
+\newcommand{\AG}{\ensuremath{\mathit{AG}}\xspace}
+
+\newcommand{\pathlen}{\ensuremath{\ell}\xspace}
+\newcommand{\paths}{\ensuremath{\Pi}\xspace}
+\newcommand{\maxpaths}{\ensuremath{\Pi^{\mathit{max}}}\xspace}
+\newcommand{\en}{\ensuremath{en}\xspace} 
+\newcommand{\props}{\ensuremath{\mathit{AP}}\xspace}
+\newcommand{\apeval}{\ensuremath{\mathit{v}}\xspace}
