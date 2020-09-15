@@ -5,12 +5,16 @@
 \usepackage{dsfont}
 \usepackage{xspace} 
 \usepackage{xparse}
-\usepackage{subcaption}
+%\usepackage{subcaption}
 \usepackage{times}
 \usepackage{newtxtext,newtxmath}
 
 \newcommand{\rarc}[1]{\ensuremath{\xrightarrow{#1}}\xspace} % right pointing arc with label \arc{t}
 \newcommand{\ctlformulas}{\ensuremath{\Phi_{\mathit{CTL}}}\xspace} % set of CTL formulas
+
+\newcommand{\tran}[3]{#1 \xrightarrow{\, #2 \,} #3}
+\newcommand{\tuple}[1]{\langle #1 \rangle}
+%\newcommand{\trans}[1]{\ensuremath{\xrightarrow{\scriptstyle {#1}}}}
 
 
 \NewDocumentCommand{\rtrans}{oo} 
@@ -56,3 +60,25 @@
 \newcommand{\en}{\ensuremath{en}\xspace} 
 \newcommand{\props}{\ensuremath{\mathit{AP}}\xspace}
 \newcommand{\apeval}{\ensuremath{\mathit{v}}\xspace}
+
+
+% macro pour Petri
+\newcommand{\Places}{\ensuremath{\mathcal{P}}}
+\newcommand{\Trans}{\ensuremath{\mathcal{T}}}
+\newcommand{\Pre}{\ensuremath{\mathcal{W}_-}}
+\newcommand{\Post}{\ensuremath{\mathcal{W}_+}}
+\newcommand{\Effect}{\ensuremath{\mathcal{W}_e}}
+\newcommand{\tPre}{\ensuremath{\mathcal{W}_-^\top}}
+\newcommand{\tPost}{\ensuremath{\mathcal{W}_+^\top}}
+\newcommand{\Preset}[1]{\ensuremath{\bullet{#1}}}
+\newcommand{\Postset}[1]{\ensuremath{{#1}\bullet}}
+
+% reachable states
+\newcommand{\Reach}{\ensuremath{\mathcal{R}}}
+\newcommand{\Stutter}{\ensuremath{\mathcal{S}_{t}}}
+
+% logic symbols
+\renewcommand{\implies}{\Rightarrow}
+\renewcommand{\impliedby}{\Leftarrow}
+\renewcommand{\iff}{\Leftrightarrow}
+

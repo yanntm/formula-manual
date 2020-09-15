@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{llncs}
 
 \input{macros.tex}
 
@@ -19,6 +19,32 @@ This document presents the official semantics for properties used in the Model-C
 \section{Syntax}
 
 \subsection{Place Transition Nets}
+
+
+\subsubsection{Petri net syntax and semantics}
+
+\begin{definition}
+Structure. A Petri net $N=\tuple{\Places,\Trans,\Pre,\Post, m_0}$ is a tuple where \Places{} is the set of places, \Trans{} is the set of transitions, $\Pre: \Places \times \Trans \mapsto \nat$ and $\Post: \Places \times \Trans \mapsto \nat$ represent the pre and post incidence matrices, and $m_0: \Places \mapsto \nat$ is the initial marking.
+\end{definition}
+
+Notations: 
+We use $p$ (resp. $t$) to designate a place (resp. transition) or its index dependent on the context. We let markings $m$ be manipulated as vectors of natural with $|\Places|$ entries. We let $\Pre(t)$ and $\Post(t)$ for any given transition $t$ represent vectors with $|\Places|$ entries. $\tPre, \tPost$ are the transposed flow matrices, where an entry $\tPre(p)$ is a vector of $|\Trans|$ entries. We note $\Effect = \Post - \Pre$ the integer matrix representing transition \textit{effects}. 
+
+In vector spaces, we use $v \geq v'$ to denote $\forall i, v(i)\geq v'(i)$, and offer sum $v+v'$ and scalar product $k \cdot v$ for scalar $k$ with usual element-wise definitions.
+
+We note $\Preset{n}$ (resp. \Postset{n}) the pre set (resp. post set) of a node $n$ (place or transition). E.g. for a transition $t$ its pre set is $\Preset{t}= \{ p \in \Places \mid \Pre(p,t) > 0 \}$.  A marking $m$ is said to \textit{enable} a transition $t$ if and only if $m \geq \Pre(t)$. A transition $t$ is said to \emph{read} from place $p$ if $\Pre(p,t)>0 \land \Effect(p,t)=0$.
+
+\vspace{-0.5em}
+\begin{definition}
+Semantics. The semantics of a Petri net are given by the firing rule $\xrightarrow{t}$ that relates pairs of markings: in any marking $m \in  \nat^{|\Places|}$, if $t \in \Trans$ satisfies $m \geq \Pre(t)$, then $m\xrightarrow{t}m'$ with $m' = m + \Post(t) - \Pre(t)$. The reachable set $\Reach{}$ is inductively defined as the smallest subset of $\nat^{|\Places|}$ satisfying $m_0 \in \Reach$, and $\forall t \in \Trans{}, \forall m \in \Reach{}, m \xrightarrow{t} m' \implies m' \in \Reach$.
+\end{definition}
+
+\vspace{-1em}
+\subsubsection{Properties of Interest}
+
+We focus on deadlock detection and verification of safety properties. A net contains a deadlock if its reachable set contains a marking $m$ in which no transition is enabled.
+A safety property asserts an invariant $\mathcal{I}$ that all reachable states must satisfy. The invariant is given as a Boolean combination ($\lor, \land, \lnot$) of atomic propositions that can compare ($\bowtie \in \{<, \leq, =, \geq, >\}$) arbitrary weighted sum of place markings to another sum or a constant, e.g. $\sum_{p \in \Places} \alpha_p \cdot m(p) \bowtie k$, with $\alpha_p \in \zrel$ and $k \in \zrel$.
+
 
 \subsection{Colored Nets}
 
