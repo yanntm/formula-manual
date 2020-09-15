@@ -1,0 +1,153 @@
+\documentclass{article}
+
+\usepackage{syntax}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xspace} 
+\usepackage{xparse}
+\usepackage{subcaption}
+
+\newcommand{\rarc}[1]{\ensuremath{\xrightarrow{#1}}\xspace} % right pointing arc with label \arc{t}
+\newcommand{\ctlformulas}{\ensuremath{\Phi_{\mathit{CTL}}}\xspace} % set of CTL formulas
+
+
+\NewDocumentCommand{\rtrans}{oo} 
+{\IfNoValueTF {#1}
+        {\ensuremath{\xrightarrow{}}\xspace}
+        {\IfNoValueTF {#2}
+            {\ensuremath{\xrightarrow{#1}}\xspace}
+            {\ensuremath{\xrightarrow[#2]{#1}}\xspace}}}
+
+\NewDocumentCommand{\eval}{oo}
+{\IfNoValueTF {#1}
+        {\ensuremath{\mathit{eval}}\xspace}
+        {\IfNoValueTF {#2}
+            {\ensuremath{\mathit{eval}_{#1}}\xspace}
+            {\ensuremath{\mathit{eval}_{#1}(#2)}\xspace}}}
+
+% LTS
+\newcommand{\lts}{\ensuremath{TS}\xspace} % name of any LTS
+\newcommand{\ltsstates}{\ensuremath{\mathcal{S}}\xspace} % set of all markings
+\newcommand{\ltslabels}{\ensuremath{A}\xspace} % set of all markings
+\newcommand{\ltsedges}{\ensuremath{\mathcal{\rightarrow}}\xspace} % set of all markings
+
+\newcommand{\deadlock}{\ensuremath{\mathit{deadlock}}\xspace}
+\newcommand{\true}{\ensuremath{\mathit{true}}\xspace}
+\newcommand{\false}{\ensuremath{\mathit{false}}\xspace}
+\newcommand{\EF}{\ensuremath{\mathit{EF}}\xspace}
+\newcommand{\AG}{\ensuremath{\mathit{AG}}\xspace}
+
+\newcommand{\pathlen}{\ensuremath{\ell}\xspace}
+\newcommand{\paths}{\ensuremath{\Pi}\xspace}
+\newcommand{\maxpaths}{\ensuremath{\Pi^{\mathit{max}}}\xspace}
+\newcommand{\en}{\ensuremath{en}\xspace} 
+\newcommand{\props}{\ensuremath{\mathit{AP}}\xspace}
+\newcommand{\apeval}{\ensuremath{\mathit{v}}\xspace}
+
+\title{CTL Semantics for the Use in MCC}
+
+\begin{document}
+\maketitle
+
+
+
+A \emph{labelled transition system} (LTS) is a 
+tuple $(\ltsstates, \ltslabels, \ltsedges)$ where $\ltsstates$ is a 
+set of states, $\ltslabels$ is a set of actions (or labels), 
+and $\ltsedges{} \subseteq \ltsstates \times \ltslabels \times \ltsstates$ is a transition relation. We write $s \rtrans[a] s'$ 
+whenever $(s,a,s') \in \ltsedges$ and say that $a$ is \emph{enabled} in $s$.
+The set of all enabled actions in a state $s$ is denoted $\en(s)$.
+We write $s \rtrans s'$ whenever there is an action $a$ such that
+$s \rtrans[a] s'$.
+
+A \emph{run} starting at $s_0$ is any finite or infinite sequence
+$s_0 \rtrans[a_0] s_1 \rtrans[a_1] s_2 \rtrans[a_2] \cdots$ where
+$s_0, s_1, s_2, \ldots \in \ltsstates$, 
+$a_0, a_1, a_2 \cdots \in \ltslabels$ and
+$(s_i,a_i,s_{i+1}) \in \ltsedges$ for all respective $i$.
+We use $\paths(s)$ to denote the set of all runs starting at the state $s$.
+A run is \emph{maximal} if it is either infinite or ends in a state that
+is a deadlock.  Let $\maxpaths(s)$ denote the set of all maximal 
+runs starting at the state $s$.
+A \emph{position} $i$ in a run $\pi = 
+s_0 \rtrans[a_0] s_1 \rtrans[a_1] s_2 \rtrans[a_2] \cdots$
+refers to the state $s_i$ in the path and is written as $\pi_i$.
+If $\pi$ is infinite then any $i$, $0 \leq i$, is a position in $\pi$.
+Otherwise $0 \leq i \leq n$ where $s_n$ is the last state in $\pi$.
+
+We now define the syntax and semantics of a \emph{computation tree logic} 
+as used in the Model Checking Contest.
+Let \props be a set of atomic propositions.
+We evaluate atomic propositions on a given LTS
+$\lts = (\ltsstates, \ltslabels, \ltsedges)$ 
+by the function $\apeval : \ltsstates \rarc{} 2^{\props}$ so that
+ $\apeval(s)$ is the set of atomic propositions satisfied 
+in the state $s \in \ltsstates$.
+
+The CTL syntax is given as follows (where $\alpha \in \props$ ranges over atomic propositions):
+\newcommand{\indalt}[1][2]{\\\hspace*{1pt}\textbar\hspace*{3.5pt}}
+%\setlength{\grammarindent}{3em} % increase separation between LHS/RHS 
+\begin{grammar}
+    \let\syntleft\relax
+    \let\syntright\relax
+
+    <$\varphi$> ::= \true | \false | $\alpha$ |$\deadlock$ | $\varphi_{1} \land \varphi_{2}$ | $\varphi_{1} \lor \varphi_{2}$ | $ \neg\varphi$ 
+%| $\varphi_{1} \mathord{\implies} \varphi_{2}$ | $\varphi_1 \mathord{\iff} \varphi_2$  
+| $\mathit{AX}\varphi$ | $\mathit{EX}\varphi$ | $\mathit{AF}\varphi$ | $\mathit{EF}\varphi$ | $\mathit{AG}\varphi$ | $\mathit{EG}\varphi$ | $\mathit{A}(\varphi_1\mathit{U}\varphi_2)$ | $\mathit{E}(\varphi_1\mathit{U}\varphi_2)$ \ .
+\end{grammar}
+We use \ctlformulas to denote the set of all CTL formulae.
+The semantics of a CTL formula $\varphi$ in a state $s \in \ltsstates$ 
+is given in Table~\ref{tab:CTLsemantics}. 
+
+\begin{table}[t]
+\raggedbottom
+\begin{align*} 
+    &s \models \true && \\
+    &s \not\models \false &&  \\
+%    &s \models a && \mbox{iff } a \in \en(s) \\
+    &s \models \alpha && \mbox{iff } \alpha \in \apeval(s) \\
+	&s \models \deadlock &&\mbox{iff } \en(s) = \emptyset \\
+	&s \models \varphi_1 \land \varphi_2 &&\mbox{iff } s \models \varphi_1 \mbox{ and } s \models \varphi_2 \\
+	&s \models \varphi_1 \lor \varphi_2 &&\mbox{iff } s \models \varphi_1 \mbox{ or } s \models \varphi_2 \\
+	&s \models \neg \varphi&&\mbox{iff } s \not\models \varphi\\
+% &s \models \varphi_1 \mathord{\implies} \varphi_2 &&\mbox{iff } s \not\models \varphi_1 \mbox{ or } s \models \varphi_2 \\
+% &s \models \varphi_1 \mathord{\iff} \varphi_2 &&\mbox{iff } (s \models \varphi_1 \mbox{ iff } s \models \varphi_2) \\
+	&s \models \mathit{AX}\varphi&& \mbox{iff } s' \models \varphi \mbox{ for all } s' \in \ltsstates \mbox{ s.t. } s \rtrans s' \\ 
+&s \models \mathit{EX}\varphi&&\mbox{iff there is } s' \in \ltsstates \mbox{ s.t } s \rtrans s' \mbox{ and } s' \models \varphi \\
+	&s \models \mathit{AF}\varphi&&\mbox{iff for all }\pi \in \maxpaths(s) \mbox{ there is a position } i \mbox{ in } \pi \mbox{ s.t. } \pi_i \models \varphi \\
+	&s \models \mathit{EF}\varphi&&\mbox{iff there is } \pi \in \maxpaths(s) \mbox{ and a position } i \mbox{ in } \pi \mbox{ s.t. } \pi_i \models \varphi \\
+	&s \models \mathit{AG}\varphi&&\mbox{iff for all } \pi \in \maxpaths(s) \mbox{ and for all positions } i \mbox{ in } \pi \mbox{ we have } \pi_i \models \varphi \\
+	&s \models \mathit{EG}\varphi &&\mbox{iff there is }\pi \in \maxpaths(s) \mbox{ s.t. for all positions } i \mbox{ in } \pi \mbox{ we have } \pi_i \models \varphi \\
+	&s \models \mathit{A}(\varphi_1 \mathit{U} \varphi_2) &&\mbox{iff for all }\pi \in \maxpaths(s) \mbox{ there is a position } i \mbox{  in } \pi  \mbox{ s.t. }\\
+	& && \pi_i \models \varphi_2 \mbox{ and for all $j$, } 0 \leq j < i, \mbox{ we have } \pi_j \models \varphi_1 \\
+	&s \models \mathit{E}(\varphi_1 \mathit{U} \varphi_2) &&\mbox{iff there is }\pi \in \maxpaths(s) \mbox{ and there is a position } i \mbox{ in } \pi \mbox{ s.t. } \\
+	& && \pi_i \models \varphi_2 \mbox{ and for all $j$, } 0 \leq j < i, \mbox{ we have } \pi_j \models \varphi_1
+\end{align*}
+\caption{Semantics of CTL formulae} \label{tab:CTLsemantics}
+\end{table}
+
+%Let $N = \petriinhibtuple$ be a Petri net. 
+Finally, we fix the set of atomic propositions $\alpha$ ($\alpha \in \props$) 
+for Petri nets as used in the MCC Property Language:
+\begin{grammar}
+    \let\syntleft\relax
+    \let\syntright\relax
+    <$\alpha$> ::= \textit{t} |  $e_1 \bowtie e_2$
+
+    <$e$> ::= $c$ | $p$ | $e_1 \oplus e_2$
+\end{grammar}
+where  $t$ is a transition, $c \in \mathbb{N}^0$, $\bowtie$ $\in$ $\{<, \leq, =, \neq, >, \geq\}$, $p$ is a place, and $\oplus \in \{ +, -, * \}$.
+The evaluation function $\apeval$ for a marking $M$ is given as
+$\apeval(M) = \{ t \in T \mid t \in \en(M) \} \cup
+\{ e_1 \bowtie e_2 \mid \eval[M][e_1] \bowtie \eval[M][e_2]\}$
+where $\eval[M][c] = c$, $\eval[M][p] = M(p)$ and
+$\eval[M][e_{1} \oplus e_{2}] = \eval[M][e_{1}] \oplus \eval[M][e_{2}]$.
+
+\paragraph{Acknowledgement.} Definitions are taken from~\cite{BDJJS:PN:18}.
+
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+
+\end{document}
